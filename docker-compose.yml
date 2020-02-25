@@ -1,0 +1,59 @@
+version: '3.7'
+services: 
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        ports: 
+            - 8090:80
+        environment: 
+            MYSQL_ROOT_PASSWORD: password
+            PMA_ARBITRARY: 1
+        depends_on: 
+            - mariadb
+        networks: 
+            - local_lempp
+        restart: always
+    mariadb:
+        image: mariadb
+        container_name: mariadb
+        volumes: 
+            - local_mariadb:/var/lib/mysql
+        environment: 
+            MYSQL_ROOT_PASSWORD: password
+        restart: always
+        networks: 
+            - local_lempp
+    nginx:
+        image: nginx
+        container_name: nginx
+        ports: 
+            - 80:80
+        volumes: 
+            - ./nginx/conf.d:/etc/nginx/conf.d
+            - ./nginx/app:/var/www/html/
+        networks: 
+            - local_lempp
+        links: 
+            - php7.2-fpm
+        restart: always
+    php7.2-fpm:
+        build:
+            context: .
+            dockerfile: php.Dockerfile
+        image: php:fpm-7.2
+        container_name: php7.2-fpm
+        ports: 
+            - 9072:9000
+        volumes: 
+            - ./nginx/app:/var/www/html
+        links: 
+            - mariadb
+        restart: always
+        networks: 
+            - local_lempp
+networks: 
+    local_lempp:
+        name: local_lempp
+volumes: 
+    local_mariadb:
+        external: true
