@@ -6,41 +6,41 @@ services:
         ports: 
             - 8090:80
         environment: 
-            MYSQL_ROOT_PASSWORD: password
             PMA_ARBITRARY: 1
-        depends_on: 
-            - mariadb
         networks: 
             - local_lempp
         restart: always
     mariadb:
-        image: mariadb
+        image: yukitoki/mariadb:10.4
         container_name: mariadb
         volumes: 
             - local_mariadb:/var/lib/mysql
         environment: 
-            MYSQL_ROOT_PASSWORD: password
+            MYSQL_ROOT_PASSWORD: HatsuneMiku01
         restart: always
         networks: 
             - local_lempp
     nginx:
-        image: nginx
+        image: yukitoki/nginx-alpine-ssl
         container_name: nginx
         ports: 
             - 80:80
+            - 443:443
         volumes: 
-            - ./nginx/conf.d:/etc/nginx/conf.d
-            - ./nginx/app:/var/www/html/
+            - $PWD/nginx/conf.d:/etc/nginx/conf.d
+            - $PWD/nginx/app:/var/www/html
+            - $PWD/nginx/ssl:/etc/ssl/private
+            - $PWD/nginx/ssl:/etc/ssl/certs
+        environment: 
+            CRT: nginx.crt
+            KEY: nginx.key
         networks: 
             - local_lempp
         links: 
             - php7.2-fpm
         restart: always
     php7.2-fpm:
-        build:
-            context: .
-            dockerfile: php.Dockerfile
-        image: php:fpm-7.2
+        image: yukitoki/php:7.2-fpm
         container_name: php7.2-fpm
         ports: 
             - 9072:9000
