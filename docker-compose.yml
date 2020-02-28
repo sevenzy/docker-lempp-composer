@@ -16,7 +16,7 @@ services:
         volumes: 
             - local_mariadb:/var/lib/mysql
         environment: 
-            MYSQL_ROOT_PASSWORD: HatsuneMiku01
+            MYSQL_ROOT_PASSWORD: password
         restart: always
         networks: 
             - local_lempp
